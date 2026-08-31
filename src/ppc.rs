@@ -125,6 +125,18 @@ impl<F: FloatConvert<Self>> From<DoubleFloat<F>> for Fallback<F> {
 
 float_common_impls!(DoubleFloat<F>);
 
+impl<F: Float> FloatConvert<Self> for DoubleFloat<F>
+where
+    F: FloatConvert<Fallback<F>>,
+    F: FloatConvert<FallbackExtended<F>>,
+    FallbackExtended<F>: FloatConvert<F>,
+{
+    fn convert_r(self, _round: Round, loses_info: &mut bool) -> StatusAnd<Self> {
+        *loses_info = false;
+        Status::OK.and(self)
+    }
+}
+
 impl<F: Float> Neg for DoubleFloat<F> {
     type Output = Self;
     fn neg(self) -> Self {
